@@ -1,0 +1,2 @@
+# Preserve the supplied specification's intentional Markdown hard line breaks.
+docs/SPEC.md whitespace=-blank-at-eol
