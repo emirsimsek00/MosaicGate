@@ -27,7 +27,7 @@ kept separate from deterministic tests and offline scripted results.
 
 ### Sequential checklist
 
-- [ ] 1. Foundation: preserve checkout; copy spec; initialize locked Python 3.12
+- [x] 1. Foundation: preserve checkout; copy spec; initialize locked Python 3.12
   uv package; README, license, CI, environment example, fixture conventions;
   exercise text and native images through a real MCP client/server; full pytest,
   Ruff, type check; commit and push.
@@ -93,7 +93,8 @@ kept separate from deterministic tests and offline scripted results.
 
 ## Step 1 — foundation
 
-In progress. Validation and remote verification will be recorded after execution.
+Complete. All required checks passed; implementation commit
+`c59e9a89adc0c2825d1e9f5730cf9e5c47842880` was pushed to `origin/main`.
 
 
 ### Step 1 validation — executed
@@ -138,3 +139,46 @@ In progress. Validation and remote verification will be recorded after execution
   already present in the supplied spec. Preserved the required byte-for-byte
   copy and scoped a Git whitespace attribute to `docs/SPEC.md`; no executable
   source or test failed, and no implementation rollback was needed.
+
+### Step 1 backup verified
+
+- Commit: `c59e9a89adc0c2825d1e9f5730cf9e5c47842880` —
+  `build: establish validated offline MCP foundation`.
+- `git push origin main` succeeded (`496de70..c59e9a8 main -> main`).
+- Working tree was clean after that push, with `main` tracking `origin/main`.
+- Verified `docs/SPEC.md` byte-for-byte against the supplied file. SHA-256:
+  `90fa1b0a7a38bcb1fa36bbd9fbc266f527df93b6f82f2b726c242ca7fc9a00c5`.
+
+## Step 2 — feasibility gate: blocked on user credential
+
+Entered only after Step 1 passed and its implementation was pushed.
+
+- Rechecked `GEMINI_API_KEY` and `GOOGLE_API_KEY`: both absent from the process
+  environment. Checked repository `.env*` files excluding `.env.example`:
+  zero local credential files. No credential values were printed or committed.
+- No free/unbilled project confirmation is available. The presence of a free
+  model on Google's pricing page cannot establish this account's billing state.
+- Asked the user to put `GEMINI_API_KEY` in the ignored repository `.env`, using
+  `.env.example` as the template, and confirm Free tier with billing disabled.
+  This is the credential stop explicitly required by the user's request and
+  spec section 5 step 2, not a plan or approval review.
+- Zero live API requests, zero feasibility sessions, zero live comparison
+  sessions. The native-image Gemini cycle has **not** been tested.
+- Steps 3–6 have not been started because the required sequential gate is
+  incomplete. No inspector, authorization guarantee, evaluation rate, generated
+  comparison report, recording, or publication is claimed.
+- GitHub CLI authentication remains a later release prerequisite for API-based
+  visibility management; existing SSH pushes succeed. No visibility change has
+  been attempted.
+
+### Resume procedure
+
+1. Read this log and `AGENTS.md`; use the same checkout and locked dependencies.
+2. Check for the local key without printing it. Establish that its project is
+   Free tier and billing is disabled; user confirmation is acceptable.
+3. Recheck model availability and execute the minimal manual native-image
+   function cycle using real MCP output. Preserve call IDs and model context,
+   disable automatic function execution, and save synthetic-only evidence.
+4. Diagnose any pilot failure against the official docs before implementing the
+   full adapter. Pass all gates, commit, and push Step 2 before Step 3.
+5. Continue the remaining checklist autonomously; never request plan reviews.

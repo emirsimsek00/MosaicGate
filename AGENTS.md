@@ -56,6 +56,19 @@ uv run --locked mypy
 
 ## Current state
 
-Step 1 is in progress. Step 2 requires a free-tier Gemini credential, currently
-absent. Later milestones must not be marked complete or started before their
-predecessor's gate passes. See the verification log for current evidence.
+Step 1 is complete and pushed (`c59e9a8`): seven actual MCP integration tests,
+Ruff, formatting, and strict mypy passed. Diagnostics are available as:
+
+```sh
+uv run --locked mosaicgate doctor
+uv run --locked mosaicgate smoke --modality text
+uv run --locked mosaicgate smoke --modality image
+```
+
+Step 2 is blocked on the absent free-tier Gemini credential. The user has been
+asked to create local `.env` from `.env.example` and confirm that the project is
+Free tier with billing disabled. No live calls have run. Resume with the actual
+native-image feasibility pilot; do not skip it or start Step 3 early. The
+inspector, authorizer, controller, evaluation, and release are not implemented.
+GitHub SSH pushes work; GitHub CLI is unauthenticated, so release visibility
+management still needs authentication. See the verification log for evidence.
