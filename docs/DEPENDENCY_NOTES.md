@@ -33,4 +33,17 @@ interfaces, not a completed live integration.
 
 Exact Python dependency versions and artifact hashes are in `uv.lock`.
 Python 3.12.14 was installed into the ignored local `.tools/python` directory.
-No Google API calls have been made. No key was present during foundation setup.
+No key was present during foundation setup. In Step 2, the user supplied a key
+and explicitly confirmed Free tier with billing disabled. Live pilot attempts
+are recorded append-only in `docs/evidence/feasibility.jsonl`; consult the
+verification log for the current gate outcome.
+
+The [Generate Content function-calling guide](https://ai.google.dev/gemini-api/docs/generate-content/function-calling?authuser=0&hl=en)
+was accessible with its query parameters on resume. The pilot uses the installed
+SDK's manual Generate Content API and retains the complete model content across
+the function-response turn, including thought signatures and call IDs.
+
+The [troubleshooting guide](https://ai.google.dev/gemini-api/docs/troubleshooting)
+states that Gemini 3.6+ ignores custom temperature/top-p/top-k settings. The
+pilot now omits them; claims of temperature-zero determinism would be incorrect.
+HTTP 503 retries are bounded and separately counted, with SDK retries disabled.

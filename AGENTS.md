@@ -16,6 +16,16 @@ brew install uv tesseract
 uv sync --locked
 ```
 
+This macOS session repeatedly marked the generated editable-install `.pth`
+file hidden, including before MCP subprocess startup. A regular wheel install
+avoids dependence on that path file. For this session use the following after
+source changes, and add `--no-editable` to each `uv run` gate command:
+
+```sh
+UV_CACHE_DIR="$PWD/.cache/uv" uv sync --locked --offline --no-editable --reinstall-package mosaicgate
+UV_CACHE_DIR="$PWD/.cache/uv" uv run --locked --no-editable pytest
+```
+
 On Debian/Ubuntu install `tesseract-ocr` and `tesseract-ocr-eng` with apt.
 For a sandbox-local Python installation/cache in this checkout:
 
@@ -65,10 +75,14 @@ uv run --locked mosaicgate smoke --modality text
 uv run --locked mosaicgate smoke --modality image
 ```
 
-Step 2 is blocked on the absent free-tier Gemini credential. The user has been
-asked to create local `.env` from `.env.example` and confirm that the project is
-Free tier with billing disabled. No live calls have run. Resume with the actual
-native-image feasibility pilot; do not skip it or start Step 3 early. The
-inspector, authorizer, controller, evaluation, and release are not implemented.
+Step 2 native-image feasibility passed with Gemini 3.6 Flash. The key and user
+confirmation of Free tier/billing disabled are in ignored `.env`. Six pilot
+requests include three failed sessions and one complete two-request success;
+all evidence is in `docs/evidence/feasibility.jsonl`. Fourteen offline tests pass.
+The current model is `gemini-3.6-flash`, with model-default sampling and low
+thinking. Preserve full returned model content and IDs; function responses use
+role `user` and native image bytes. Automatic tool execution stays disabled.
+
+Next is Step 3 (bounded inspector); then follow the sequential log checklist.
 GitHub SSH pushes work; GitHub CLI is unauthenticated, so release visibility
 management still needs authentication. See the verification log for evidence.

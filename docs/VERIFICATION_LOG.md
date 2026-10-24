@@ -31,7 +31,7 @@ kept separate from deterministic tests and offline scripted results.
   uv package; README, license, CI, environment example, fixture conventions;
   exercise text and native images through a real MCP client/server; full pytest,
   Ruff, type check; commit and push.
-- [ ] 2. Feasibility: verify a free/unbilled Gemini project and current model;
+- [x] 2. Feasibility: verify a free/unbilled Gemini project and current model;
   run a manual native-image function-response cycle, preserving model context;
   record actual evidence; full checks; commit and push.
 - [ ] 3. Inspector: bounded validation, OCR, normalization, structured content,
@@ -182,3 +182,79 @@ Entered only after Step 1 passed and its implementation was pushed.
 4. Diagnose any pilot failure against the official docs before implementing the
    full adapter. Pass all gates, commit, and push Step 2 before Step 3.
 5. Continue the remaining checklist autonomously; never request plan reviews.
+
+### Step 2 resumed — prerequisite and environment diagnosis
+
+- User supplied a local key and then explicitly confirmed: Free tier, billing
+  disabled. Recorded that attestation in ignored `.env`; this is user
+  confirmation, not an independent billing API audit. No secret values printed.
+- Initial pilot increment passed Ruff and strict mypy, but pytest could not
+  import even the original package. Saved the increment outside the checkout,
+  restored executable source to the last green commit, and reproduced the
+  same failure on the unchanged seven-test baseline.
+- Three import/check attempts encountered the same generated `.pth` issue.
+  Diagnosis: macOS flags `32832` include `UF_HIDDEN`; Python 3.12.14's `site.py`
+  explicitly skips hidden `.pth` files. Clearing only that generated install
+  file's hidden flag restored both direct and `uv run` imports. The flag
+  reappeared between tool invocations, so clear it immediately before local
+  gates. Do not modify application imports or weaken tests to conceal this.
+- A reinstall attempt failed during sandbox DNS resolution for hatchling after
+  three automatic downloader retries. Changed approach to the verified file
+  flag repair; no dependency or lockfile change was necessary.
+- Retrying in smaller increments: live settings first, then the pilot and its
+  contract tests. The complete feasibility gate still requires a real run.
+- Clearing the hidden flag fixed direct imports but did not remain effective
+  for the MCP subprocess. Changed to a regular wheel install using
+  `uv sync --locked --offline --no-editable --reinstall-package mosaicgate`;
+  subsequent commands use `uv run --locked --no-editable`. Baseline restored:
+  **7 passed in 2.39s**. No application transport change or test bypass.
+- Restored the pilot increment; **14 tests passed in 2.63s**, Ruff and formatting
+  passed, strict mypy passed on 11 source files.
+- First actual pilot request returned HTTP 503 (`ServerError`) before any tool
+  call. Preserved the failed run in `docs/evidence/feasibility.jsonl`.
+  One live request attempted; native-image receipt is not yet verified.
+- Official troubleshooting documentation permits bounded retries on HTTP 503.
+  It also now states that Gemini 3.6+ ignores custom sampling settings, with
+  future rejection planned. Adopted the actually supported model default by
+  omitting temperature rather than falsely claiming temperature zero. Record
+  this constraint in live settings and freeze it across comparison arms.
+  Source: https://ai.google.dev/gemini-api/docs/troubleshooting
+- Second 3.8 attempt returned HTTP 504 (deadline expired) before a tool call.
+  Selected the spec's documented free 3.6 Flash fallback for a fresh pilot;
+  no comparison experiment has begun, so there is no mixed-model dataset.
+- First 3.6 pilot proposed the fixed Q3 read, retained its call ID and thought
+  signature, and received actual MCP PNG bytes. The native-response request
+  returned HTTP 400. At this point: four generation requests total, zero
+  successful complete native-image sessions.
+- Diagnosed against the official Generate Content multimodal example. It uses
+  role `user` for function-response content; the initial pilot incorrectly used
+  `tool`. Saved the failed increment, restored the source/test tree to the last
+  green revision, and reapplied it with that one-field correction and a
+  regression assertion. No OCR substitution or alternate image path.
+  Source: https://ai.google.dev/gemini-api/docs/generate-content/function-calling.md
+
+
+### Step 2 outcome — native-image feasibility passed
+
+- Successful run `ca9353a6-4799-4495-8c11-075d02f350f5` used
+  `gemini-3.6-flash` (returned model version matches), two generation requests,
+  and took 3,986.7 ms. This is one pilot timing, not a latency distribution.
+- The model proposed `read_report(report_id="q3")`; the fixed pilot permission
+  check allowed it. Real MCP returned the 34,044-byte native PNG. Its bytes were
+  nested inside `FunctionResponse.parts`; the full model turn and call ID were
+  retained. The second response correctly read all three monthly revenues,
+  $330,000 total, and 20% growth. No OCR text was supplied to Gemini.
+- Four pilot sessions were attempted: two 3.8 service failures, one 3.6 payload
+  rejection, and one complete 3.6 success. **Six total generation requests**.
+  Failed traces remain present; no comparison sessions have been run.
+- Selected 3.6 Flash for subsequent live work and set the local/sample model
+  default accordingly. No paid tier, priority mode, billing change, or external
+  side effect was used. Free-project status is based on user confirmation.
+- The final adapter must use role `user` for function responses and preserve
+  the returned model content object, call IDs, and thought context. Automatic
+  SDK tool execution stays disabled. Use native image parts, never OCR text
+  as a substitute for model-visible images.
+- Offline checks passed after the role correction: **14 passed in 2.41s**;
+  Ruff check and format passed; strict mypy passed on 11 source files.
+- A final full check after updating the selected default precedes the commit
+  and push. Step 3 starts only after that push succeeds.

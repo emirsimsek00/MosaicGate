@@ -4,11 +4,11 @@ Task-grant enforcement on every agent tool call is MosaicGate's intended
 prevention layer. A separate content inspector will examine untrusted text and
 OCR-visible image text from MCP results.
 
-**Status: foundation implemented; security enforcement and evaluation pending.**
+**Status: foundation and native-image feasibility implemented; security enforcement and evaluation pending.**
 This repository currently verifies a real local MCP boundary and simulated
-side effects. It does not yet claim to prevent prompt injection. The live
-native-image feasibility gate is the next milestone and requires a Gemini key
-for a confirmed free, unbilled project.
+side effects. It does not yet claim to prevent prompt injection. The native-image feasibility pilot passed with Gemini 3.6 Flash on a user-confirmed
+free, unbilled project. Failed and successful pilot evidence is retained in
+[`docs/evidence/feasibility.jsonl`](docs/evidence/feasibility.jsonl).
 
 ## Run the foundation offline
 
@@ -60,11 +60,12 @@ controller will enforce the trusted task grant independently of that server.
 
 ## Remaining milestones
 
-The native-image Gemini pilot, bounded content inspector, task grants,
+The bounded content inspector, task grants,
 controller, scripted/live agent adapters, 48-case evaluation, comparison report,
 and release recording remain unimplemented. The public `inspect`, `demo`, `eval`,
 and `report` commands will arrive with those milestones. No attack-success,
-false-positive, live-model, or prevention-rate measurements exist yet.
+false-positive, or prevention-rate measurements exist yet. One live native-image
+pilot passed; this is feasibility evidence, not an injection-defense evaluation.
 
 The scope excludes real email, private input data, paid model usage, audio,
 steganography, general MCP proxying, and production authorization claims.
