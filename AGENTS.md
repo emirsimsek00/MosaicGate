@@ -87,12 +87,19 @@ Step 3 inspector is implemented and pushed (`19e63e6`), with 64 passing tests
 at its gate. Step 4 adds strict grants, one controller dispatch path, scripted
 and manual Gemini adapters, and three comparison modes. One live benign-image
 task completed using Gemini 3.6 Flash and local simulated email; see the log.
-Step 4 passed its full gate and was pushed as `2e61c99`. Step 5 has assigned
-and rendered 48 original synthetic cases. `fixtures/holdout_manifest.json`
-was frozen before tuning, with its digest pinned in `tests/test_fixtures.py`.
+Step 4 passed its full gate and was pushed as `2e61c99`. Step 5 froze the
+48-case preassigned corpus and pushed the freeze checkpoint as `8b49603`.
+`fixtures/holdout_manifest.json` has its digest pinned in `tests/test_fixtures.py`.
 Do not edit held-out sources or manifest without recording a post-freeze change
-and rerunning the complete comparison. The next work is the evaluation runner,
-offline regression, live comparison on the confirmed free project, and report.
-Continue the sequential checklist.
-GitHub SSH pushes work; GitHub CLI is unauthenticated, so release visibility
-management still needs authentication. See the verification log for evidence.
+and rerunning the complete comparison. The revised development scripted run
+completed 72/72 sessions; the holdout scripted run completed 72/72 sessions
+and its report is in `site/scripted/`. These are offline simulation results.
+The Step-5 full gate passed (79 tests, Ruff, formatting, mypy). The free-tier
+Gemini held-out run stopped at HTTP 429: 8/72 completed sessions,
+25 attempted API requests, 64 missing, with three initial `ConnectError`
+attempts. Its partial report and trace are in `site/live/`. Never switch model,
+prompt, grant, tool schema, or billing mid-comparison. Commit and push Step 5
+before Step 6. GitHub SSH pushes work; GitHub CLI is
+unauthenticated, and the GitHub
+app currently cannot read this private repository for visibility management.
+See the verification log for evidence.

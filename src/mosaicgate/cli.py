@@ -17,6 +17,7 @@ from mcp.types import CallToolResult, ImageContent, TextContent
 from mosaicgate import __version__
 from mosaicgate.agents import ScriptedAgent
 from mosaicgate.controller import Controller, Scenario, append_run
+from mosaicgate.evaluation import evaluate
 from mosaicgate.grants import Mode
 from mosaicgate.inspection import (
     InspectionCaps,
@@ -25,6 +26,7 @@ from mosaicgate.inspection import (
     inspect_tool_result,
 )
 from mosaicgate.live_settings import LivePrerequisiteError, require_live_settings
+from mosaicgate.reporting import create_report
 from mosaicgate.smoke_fixtures import Modality
 from mosaicgate.transport import fixture_client
 
@@ -171,6 +173,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     demo_parser.add_argument("--mode", choices=("baseline", "inspect", "full"), required=True)
     demo_parser.add_argument("--agent", choices=("scripted", "gemini"), default="scripted")
     demo_parser.add_argument("--output", type=Path, default=Path("runs/demo.jsonl"))
+    eval_parser = commands.add_parser("eval", help="Run the frozen synthetic case suite")
+    eval_parser.add_argument("--suite", choices=("dev", "holdout"), required=True)
+    eval_parser.add_argument("--agent", choices=("scripted", "gemini"), default="scripted")
+    eval_parser.add_argument("--output", type=Path)
+    eval_parser.add_argument("--max-sessions", type=int)
+    report_parser = commands.add_parser("report", help="Render a saved synthetic evaluation")
+    report_parser.add_argument("--input", type=Path, required=True)
+    report_parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args(argv)
     if args.command == "doctor":
         output = doctor()
@@ -181,6 +191,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             output = asyncio.run(run_demo(args.scenario, args.mode, args.agent, args.output))
         except LivePrerequisiteError as error:
             parser.error(str(error))
+    elif args.command == "eval":
+        output_path = args.output or Path("runs") / f"{args.suite}-{args.agent}.jsonl"
+        try:
+            output = asyncio.run(
+                evaluate(args.suite, args.agent, output_path, max_sessions=args.max_sessions)
+            )
+        except LivePrerequisiteError as error:
+            parser.error(str(error))
+    elif args.command == "report":
+        output = create_report(args.input, args.output)
     else:
         output = inspect_file(args.input, Modality(args.modality), args.scenario)
     print(json.dumps(output, indent=2, sort_keys=True))

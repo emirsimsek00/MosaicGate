@@ -1,7 +1,10 @@
 """Manual Gemini function loop adapter; the controller owns all MCP dispatch."""
 
+import asyncio
 import base64
+import time
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from typing import Any, Self, cast
 
 from google import genai
@@ -10,6 +13,20 @@ from mcp.types import CallToolResult, ImageContent, TextContent
 
 from mosaicgate.agents import GOAL, AgentTurn, ProposedCall
 from mosaicgate.live_settings import LiveSettings
+
+
+@dataclass
+class RequestPacer:
+    """Space live requests across sessions on a free project."""
+
+    interval_seconds: float = 12.0
+    last_started: float | None = None
+
+    async def wait(self) -> None:
+        now = time.monotonic()
+        if self.last_started is not None:
+            await asyncio.sleep(max(0.0, self.interval_seconds - (now - self.last_started)))
+        self.last_started = time.monotonic()
 
 
 def tool_declarations() -> list[types.Tool]:
@@ -75,7 +92,7 @@ def function_response(proposal: ProposedCall, result: CallToolResult) -> types.P
 
 
 class GeminiAgent:
-    def __init__(self, settings: LiveSettings) -> None:
+    def __init__(self, settings: LiveSettings, *, pacer: RequestPacer | None = None) -> None:
         self.model_id = settings.model
         self.settings: Mapping[str, object] = {
             "sampling": "model default",
@@ -84,6 +101,7 @@ class GeminiAgent:
             "max_output_tokens": 2048,
         }
         self.api_requests = 0
+        self._pacer = pacer
         self._client = genai.Client(
             api_key=settings.api_key,
             vertexai=False,
@@ -104,6 +122,8 @@ class GeminiAgent:
         self._client.close()
 
     async def _generate(self) -> AgentTurn:
+        if self._pacer is not None:
+            await self._pacer.wait()
         self.api_requests += 1
         response = await self._client.aio.models.generate_content(
             model=self.model_id,

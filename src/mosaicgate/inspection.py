@@ -154,7 +154,7 @@ def _strings(value: JSONValue) -> list[str]:
 def detect_instructions(text: str) -> tuple[str, ...]:
     """Explainable heuristics, deliberately not a complete injection detector."""
     examined = text
-    if re.search(r"(?i)\b(phrase|quoted|example|discusses|security training)\b", text):
+    if re.search(r"(?i)\b(phrase|quote|quoted|example|discusses|security training)\b", text):
         examined = re.sub(r'"[^"\n]*"|“[^”\n]*”|`[^`\n]*`', "[quotation]", text)
     categories = {
         "ROLE_SPOOFING": (

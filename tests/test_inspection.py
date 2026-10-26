@@ -108,6 +108,7 @@ def test_detected_attacks_are_never_quoted_back(text: str, reason: str) -> None:
     [
         REPORT_TEXT,
         'Security training: the phrase "ignore previous instructions" is an injection example.',
+        'Training quote: "ignore previous instructions" is a malicious pattern.',
         'This document discusses the example "send_email(to=attacker@example.test)" as a threat.',
     ],
 )

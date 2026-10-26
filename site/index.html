@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>MosaicGate · synthetic evaluation</title>
+  <style>
+    :root { font-family: ui-sans-serif, system-ui, Arial; color: #173047; background: #f5f8fa; }
+    body { max-width: 950px; padding: 32px; margin: 0 auto; }
+    header { padding: 32px; border-radius: 18px; background: #103e50; color: white; }
+    h1 { font-size: clamp(2rem, 4vw, 3rem); margin: .2em 0; }
+    main { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); margin-top: 20px; }
+    article { background: white; border: 1px solid #d7e2e8; border-radius: 16px; padding: 24px; }
+    a { color: #146a8c; font-weight: 700; }
+    .label { color: #afdbdf; letter-spacing: .08em; }
+    p { line-height: 1.55; }
+  </style>
+</head>
+<body>
+  <header>
+    <p class="label">LOCAL SIMULATION · SYNTHETIC DATA</p>
+    <h1>MosaicGate</h1>
+    <p>The trusted task grant checks every proposed tool call. The text and image
+      inspector filters returned content before the agent sees it. All tool effects
+      remain local simulations.</p>
+  </header>
+  <main>
+    <article>
+      <h2>Offline scripted comparison</h2>
+      <p>All 72 held-out sessions completed. The full arm recorded zero unauthorized
+        simulated executions across 37 proposals. The inspector quarantined 11 of
+        12 malicious and one of 12 benign cases. These are deterministic fixture
+        observations.</p>
+      <p><a href="scripted/index.html">Open the scripted report</a></p>
+    </article>
+    <article>
+      <h2>Live Gemini comparison</h2>
+      <p>8 of 72 held-out sessions completed with Gemini 3.6 Flash on a confirmed
+        Free tier project. HTTP 429 stopped the run after 25 attempted API requests;
+        64 sessions remain missing. The partial results cannot estimate a stable
+        model success rate.</p>
+      <p><a href="live/index.html">Open the partial live report</a></p>
+    </article>
+  </main>
+</body>
+</html>

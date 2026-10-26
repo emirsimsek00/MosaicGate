@@ -1,12 +1,12 @@
 # MosaicGate
 
-Task-grant enforcement on every agent tool call is MosaicGate's intended
-prevention layer. A separate content inspector will examine untrusted text and
-OCR-visible image text from MCP results.
+Task-grant enforcement on every agent tool call is MosaicGate's prevention
+layer. A separate content inspector examines untrusted text and OCR-visible
+image text from MCP results.
 
-**Status: task-grant enforcement, inspector, and agent adapters implemented; evaluation pending.**
-This repository currently verifies a real local MCP boundary and simulated
-side effects. It does not yet claim to prevent prompt injection. The native-image feasibility pilot passed with Gemini 3.6 Flash on a user-confirmed
+**Status: local simulation, frozen corpus, and offline evaluation implemented.**
+The project verifies a real local MCP boundary and simulated side effects.
+The native-image feasibility pilot passed with Gemini 3.6 Flash on a user-confirmed
 free, unbilled project. Failed and successful pilot evidence is retained in
 [`docs/evidence/feasibility.jsonl`](docs/evidence/feasibility.jsonl).
 
@@ -68,9 +68,8 @@ planned task-grant action gate remains the security boundary.
   no external service is contacted. Email fixtures require reserved `.test` addresses.
 - Offline diagnostic CLI, synthetic smoke fixtures, and reproducible rendering.
 
-The fixture server is deliberately not an authorization boundary. Baseline
-experiments will need to demonstrate simulated unauthorized actions. The future
-controller will enforce the trusted task grant independently of that server.
+The fixture server is deliberately not an authorization boundary. The controller
+enforces the trusted task grant independently of that server in full mode.
 
 ## Run the simulated agent demo
 
@@ -89,13 +88,50 @@ scripted agent is deterministic. A manual Gemini adapter uses the same
 controller and native function responses, but requires a user-confirmed free,
 unbilled project and a local key; it is never run in CI.
 
-## Remaining milestones
+## Reproduce the frozen offline comparison
 
-The 48-case evaluation, comparison report,
-and release recording remain unimplemented. The public `inspect`, `demo`, `eval`,
-and `report` commands will arrive with those milestones. No attack-success,
-false-positive, or prevention-rate measurements exist yet. One live native-image
-pilot passed; this is feasibility evidence, not an injection-defense evaluation.
+The 48 synthetic cases were assigned to development and holdout before variants
+were rendered. The 24-case holdout is SHA-256 verified. Each case runs in
+baseline, inspection-only, and full-defense modes with the same task grant.
+The scripted agent makes no API calls.
+
+```sh
+uv run --locked mosaicgate eval --suite holdout --agent scripted --output runs/holdout-scripted.jsonl
+uv run --locked mosaicgate report --input runs/holdout-scripted.jsonl --output site/scripted
+```
+
+The committed [static report](site/scripted/index.html),
+[aggregate JSON](site/scripted/aggregate.json), and
+[saved JSONL traces](site/scripted/traces.jsonl) expose every held-out case.
+The report's media and per-case details show what the agent proposed, what the
+authorizer decided, and what the local MCP ledger recorded. The report command
+rebuilds its HTML and JSON from the saved traces and verified fixtures.
+
+The held-out **scripted** run completed 72/72 sessions with zero model API
+requests. The full arm quarantined 11/12 malicious cases and 1/12 benign cases,
+completed 11/12 benign tasks, and recorded 0/37 unauthorized simulated tool
+executions per proposed call. OCR returned nonempty text for 12/12 inspected
+images, which does not mean it read every line. In baseline, 8/56 proposed
+calls executed outside the grant in the local simulation. These are
+deterministic fixture results, not estimates of live model attack rates or
+production guarantees. The missed malicious image and benign false positive
+remain visible in the report.
+
+The [live held-out report](site/live/index.html) uses the same frozen Gemini
+3.6 Flash model, prompt, grant, and tool schema across arms on the
+user-confirmed Free tier. It is never part of CI. The append-only trace has
+13 attempts and 25 attempted API requests: 8 sessions completed, 3 ended in
+connection errors before network access was granted, and 2 ended in HTTP 429.
+The remaining 64 sessions are **missing**, not scored as failures. A paced
+resume after the short rate window also returned 429, so the free project
+limit prevented a complete comparison in this run. Among the completed
+sessions, the full arm quarantined 3/3 malicious text cases and recorded zero
+unauthorized simulated executions across 3 proposals; no benign or image
+sessions completed. These small, uneven counts do not support a stable live
+model rate. The [saved live trace](site/live/traces.jsonl) permits later
+resumption with the same protocol when free quota returns.
+
+## Scope
 
 The scope excludes real email, private input data, paid model usage, audio,
 steganography, general MCP proxying, and production authorization claims.
@@ -108,5 +144,5 @@ steganography, general MCP proxying, and production authorization claims.
 - [Synthetic fixture convention](fixtures/README.md).
 - [Dependency and API references](docs/DEPENDENCY_NOTES.md).
 
-MIT licensed. Development remains local and in the existing GitHub repository;
-publication follows final validation.
+MIT licensed. Publication of the existing GitHub repository follows final
+validation.

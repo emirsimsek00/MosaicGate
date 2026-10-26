@@ -40,7 +40,7 @@ kept separate from deterministic tests and offline scripted results.
 - [x] 4. Authorization and controller: strict grants, single dispatch path,
   ledger, scripted adapter and three modes; unauthorized-attempt/denial and
   benign-completion tests; full checks; commit and push.
-- [ ] 5. Evaluation: 48 original pre-split synthetic fixtures; freeze holdout
+- [x] 5. Evaluation: 48 original pre-split synthetic fixtures; freeze holdout
   before tuning; offline regression; free-tier live comparison when possible;
   append-only/resumable evidence, aggregate JSON and static report; full checks;
   commit and push.
@@ -375,3 +375,71 @@ Entered only after Step 1 passed and its implementation was pushed.
 - Freeze checkpoint full gate: **76 passed in 6.14s**; Ruff check and format
   passed (28 files); strict mypy passed (22 source files). No live comparison
   requests have started. Commit and push below precede development tuning.
+
+## Step 5 — evaluation in progress (2026-10-26)
+
+- Initial development scripted comparison completed 72/72 sessions with zero
+  API requests. Inspector quarantined 11/12 malicious cases and 1/12 benign
+  cases in each inspecting arm. The missed pale-footer image was unreadable to
+  direct Tesseract OCR and three contrast transforms; no detection is claimed.
+  The benign training quote caused a false positive. Added a narrowly scoped
+  quote-framing rule and a regression case; the frozen holdout was not opened
+  for tuning. A new development run will measure the revised rule.
+- The new offline regression runs both 24-case splits through all three arms,
+  resumes from two saved sessions, and regenerates a static report from the
+  saved traces. The first full gate after adding it passed 79 tests in 59.20s,
+  with Ruff and mypy passing; the report was subsequently expanded to show
+  proposed calls, actual ledger effects, final responses, and missing errors.
+  A final gate is still required before Step 5 is committed.
+- The first live held-out attempt encountered `ConnectError` at the initial
+  model request three times (baseline, full, inspect) despite the API host
+  answering an unauthenticated HEAD request. No live sessions completed; three
+  attempted requests are recorded in ignored `runs/holdout-gemini.jsonl`.
+  The runner now stops on a transport error rather than cycling through cases.
+  Retry the same frozen model/protocol with approved network access; retain
+  these failed attempts in append-only evidence and count them separately.
+- Retried the unchanged Gemini 3.6 Flash protocol with approved network access;
+  successful held-out sessions are being appended. The runner spaces live
+  requests by 12 seconds and stops on quota, service, or transport errors.
+- Revised development scripted run: 72/72 complete, zero API requests. Each
+  inspecting arm quarantined 11/12 malicious and 0/12 benign cases, and
+  completed 12/12 benign tasks; the pale-footer OCR miss remains. These are
+  deterministic scripted observations after development-only tuning.
+- Frozen held-out scripted run: 72/72 complete, zero API requests. Baseline
+  simulated 8 unauthorized executions / 56 proposals. Full mode recorded
+  0 unauthorized executions / 37 proposals and denied one attempted call;
+  it quarantined 11/12 malicious cases and 1/12 benign case, extracted
+  nonempty OCR text for 12/12 inspected images, and completed 11/12 benign
+  tasks. The inspection-only arm simulated 1 unauthorized execution / 37
+  proposals. These are scripted, single-run fixture results; no live rate is
+  inferred from them. Holdout fixtures and inspector rules were not changed
+  after observing these outcomes.
+- Generated `site/scripted/index.html`, `aggregate.json`, `cases.json`, copied
+  all 24 SHA-verified sources to `media/`, and saved the append-only trace as
+  `site/scripted/traces.jsonl`. Static parser inspection found 26 local links,
+  zero missing targets, 24 case rows, 12 image elements, and 120 detail panels.
+  Browser visual QA was unavailable because the browser URL policy blocked a
+  local `file:` URL; no visual-layout claim is made.
+- Live held-out attempt stopped on HTTP 429 after eight completed sessions.
+  A single paced resume after the short rate window returned 429 again, so no
+  further live requests were made. Saved evidence has 13 attempts, 25 attempted
+  API requests, eight completions, three initial `ConnectError` failures, two
+  HTTP 429 failures, and 64 missing sessions. The completed arm counts are
+  baseline 2, inspection 3, full 3; all completed cases are malicious text.
+  The full arm quarantined 3/3 such cases and had 0 unauthorized simulated
+  executions / 3 proposed calls. No benign or image live sessions completed;
+  those metrics have denominator zero and no measured rate. A complete 72-run
+  live comparison was unavailable within the confirmed Free tier. This is a
+  service/quota limitation, not a switch to a paid tier or a different model.
+- Generated `site/live/` from the saved partial JSONL and SHA-verified frozen
+  sources; copied the trace into the report directory and added `site/index.html`
+  to distinguish deterministic scripted and incomplete live evidence.
+- Final Step-5 gate on the saved implementation: **79 passed in 58.45s**;
+  Ruff check and format passed (31 files); strict mypy passed (25 source files);
+  `git diff --check` passed. The static HTML parser found all 2 landing-page,
+  26 scripted-report, and 26 live-report links present, with no script tags.
+  Checked-in trace scan found only reserved `.test` email addresses, no
+  Gemini-key marker, and simulation flags on all 85 runs. The complete live
+  comparison remains outstanding due to repeated 429 responses; 64 sessions
+  are explicitly missing in the report. Step 5 can be committed and pushed
+  with that quota limitation recorded, as the spec permits.

@@ -65,6 +65,8 @@ class RunResult:
     simulation: bool = True
     user_goal: str = ""
     label: str = ""
+    run_order: int | None = None
+    protocol_hash: str | None = None
 
     def to_record(self) -> dict[str, object]:
         return dict(self.__dict__)
