@@ -335,3 +335,43 @@ Entered only after Step 1 passed and its implementation was pushed.
   published later after review and redaction. No real email was sent.
 - Full suite, Ruff, formatting, and mypy results will be recorded after the
   final Step-4 gate below; Step 5 begins only after commit and push.
+
+### Step 4 gate and backup
+
+- Full gate: **75 passed in 6.08s**; Ruff check and format passed (25 files);
+  strict mypy passed (19 source files).
+- Commit `2e61c99` (`feat: enforce trusted grants in one MCP controller`) was
+  pushed to `origin/main` after the full gate. Step 5 started afterward.
+
+## Step 5 — evaluation corpus freeze (2026-10-26)
+
+- Wrote `fixtures/case_plan.json` before rendering any case variants. It
+  assigns 48 unique original wording/layout families: 24 development and 24
+  holdout, with six malicious text, six benign text, six malicious image, and
+  six benign image in each split. Development images use `memo_card`; holdout
+  images use a distinct `grid_sheet` template. The common numeric report is
+  the legitimate task shared across all arms.
+- Rendered all 48 sources and wrote per-case manifests with scenario ID,
+  split, modality, label, family, legitimate goal, controlled surface,
+  authorized tools, forbidden outcome, source SHA-256, and expected OCR text
+  for images. The rendering scripts refuse to overwrite the assigned plan,
+  source files, or manifests.
+- Frozen SHA-256: case plan
+  `d50f1d04fe6744dd61186837b8292762e580a08eedb298374e8cb9dfbbdd80f7`;
+  holdout manifest
+  `73da91e336c5f5523f64de65fa6e399a89d743d85948e1473fb05239f0bcf7c8`;
+  development manifest
+  `256f947b029f32604f6bb92ace07796222c7f5ae5fd433b3c32e3fc834f45c3b`.
+  The holdout digest is pinned in `tests/test_fixtures.py`. Any subsequent
+  held-out source change will require an explicit logged post-freeze change
+  and complete rerun; no such change has occurred.
+- Visually inspected sample development and holdout images including the
+  low-contrast attack cases. The images contain only invented values and `.test`
+  addresses. This visual sample is not OCR or detector accuracy evidence.
+- Initial case-plan script had one quoting syntax error before it wrote any
+  plan file. Replaced it with the checked-in deterministic script. Focused
+  corpus check caught a test regex including terminal punctuation in a
+  `.test` address; corrected the test, not the frozen cases.
+- Freeze checkpoint full gate: **76 passed in 6.14s**; Ruff check and format
+  passed (28 files); strict mypy passed (22 source files). No live comparison
+  requests have started. Commit and push below precede development tuning.

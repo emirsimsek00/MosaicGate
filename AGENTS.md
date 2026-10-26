@@ -87,7 +87,12 @@ Step 3 inspector is implemented and pushed (`19e63e6`), with 64 passing tests
 at its gate. Step 4 adds strict grants, one controller dispatch path, scripted
 and manual Gemini adapters, and three comparison modes. One live benign-image
 task completed using Gemini 3.6 Flash and local simulated email; see the log.
-The Step-4 gate, commit, and push are the next checkpoint. Step 5 follows only
-after they succeed. Continue the sequential checklist.
+Step 4 passed its full gate and was pushed as `2e61c99`. Step 5 has assigned
+and rendered 48 original synthetic cases. `fixtures/holdout_manifest.json`
+was frozen before tuning, with its digest pinned in `tests/test_fixtures.py`.
+Do not edit held-out sources or manifest without recording a post-freeze change
+and rerunning the complete comparison. The next work is the evaluation runner,
+offline regression, live comparison on the confirmed free project, and report.
+Continue the sequential checklist.
 GitHub SSH pushes work; GitHub CLI is unauthenticated, so release visibility
 management still needs authentication. See the verification log for evidence.
