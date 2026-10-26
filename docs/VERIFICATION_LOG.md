@@ -34,7 +34,7 @@ kept separate from deterministic tests and offline scripted results.
 - [x] 2. Feasibility: verify a free/unbilled Gemini project and current model;
   run a manual native-image function-response cycle, preserving model context;
   record actual evidence; full checks; commit and push.
-- [ ] 3. Inspector: bounded validation, OCR, normalization, structured content,
+- [x] 3. Inspector: bounded validation, OCR, normalization, structured content,
   reason codes, safe forwarding and quarantine; negative and benign tests;
   full checks; commit and push.
 - [ ] 4. Authorization and controller: strict grants, single dispatch path,
@@ -258,3 +258,37 @@ Entered only after Step 1 passed and its implementation was pushed.
   Ruff check and format passed; strict mypy passed on 11 source files.
 - A final full check after updating the selected default precedes the commit
   and push. Step 3 starts only after that push succeeds.
+
+## Step 3 — inspector (resumed 2026-10-26)
+
+- Implemented `inspect_tool_result(result, context)` with stable PASS/QUARANTINE
+  verdicts, reason codes, input hash, extraction state, local analysis text,
+  elapsed time, and safe forwarded MCP result. Default `decision_record` omits
+  content; an explicitly synthetic excerpt is HTML-escaped.
+- Supports text, native PNG/JPEG/WebP, and recursively inspected structured
+  content and metadata. Rejects audio, resources, unsupported or malformed
+  images, oversized inputs, deep data, too many blocks/nodes, OCR failures,
+  OCR timeout, and empty OCR output. Text, decoded media, pixels,
+  normalization work, and OCR runtime are bounded. Quarantines return only the
+  fixed neutral message with no original metadata.
+- The official MCP SDK discards unknown wire fields on parsing. The inspector
+  does not claim to have examined data that was already discarded; its safe
+  forwarded result includes only known validated fields. This is covered by a
+  regression test.
+- Explainable rule categories cover role spoofing, direct instructions, off-task
+  tool commands, and exfiltration destinations. Quoted security examples pass
+  focused tests. These heuristics are not a complete attack detector, and the
+  independent action gate remains essential.
+- Resumed WIP initially had two failed tests and two mypy errors. Corrected a
+  repeated base64 decode, typed bounded metadata maps, and replaced an
+  impossible unknown-wire-field test with an SDK-discard regression. Checks then
+  passed; no user file was discarded.
+- Final Step-3 full gate: **64 passed in 3.32s**; Ruff check passed; Ruff format
+  passed (19 files); strict mypy passed (13 source files).
+- Actual MCP image and actual OCR tests pass. The malicious PNG text is detected
+  and replaced by the neutral quarantine message. Local `mosaicgate inspect`
+  returned PASS for both synthetic smoke fixtures. One smoke run measured
+  0.548 ms for text and 141.938 ms for image; these are single-run timings,
+  not benchmark percentiles.
+- No Gemini comparison sessions have been run in Step 3.
+- Commit and push will be recorded after execution below.

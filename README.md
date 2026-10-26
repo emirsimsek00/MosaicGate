@@ -4,7 +4,7 @@ Task-grant enforcement on every agent tool call is MosaicGate's intended
 prevention layer. A separate content inspector will examine untrusted text and
 OCR-visible image text from MCP results.
 
-**Status: foundation and native-image feasibility implemented; security enforcement and evaluation pending.**
+**Status: inspector and native-image feasibility implemented; action enforcement and evaluation pending.**
 This repository currently verifies a real local MCP boundary and simulated
 side effects. It does not yet claim to prevent prompt injection. The native-image feasibility pilot passed with Gemini 3.6 Flash on a user-confirmed
 free, unbilled project. Failed and successful pilot evidence is retained in
@@ -44,6 +44,20 @@ ledgers. GitHub Actions runs only offline checks, with no model credentials or
 live API calls. Local results are recorded in [the verification log](docs/VERIFICATION_LOG.md);
 workflow execution is not claimed merely because its configuration exists.
 
+Inspect a local synthetic result without printing its content:
+
+```sh
+uv run --locked mosaicgate inspect --input fixtures/smoke/q3.txt --modality text
+uv run --locked mosaicgate inspect --input fixtures/smoke/q3.png --modality image
+```
+
+The inspector validates and bounds text, image bytes, pixels, nested structured
+data, normalization work, and OCR runtime. It returns a validated MCP result or
+a fixed neutral quarantine message. Tests exercise actual OCR of benign and
+malicious screenshots, malformed media, unsupported blocks, metadata, and
+benign quoted security examples. Its explainable rules are heuristic, so the
+planned task-grant action gate remains the security boundary.
+
 ## What is implemented
 
 - Locked Python 3.12 package with the official MCP SDK, Google GenAI SDK, Pillow,
@@ -60,7 +74,7 @@ controller will enforce the trusted task grant independently of that server.
 
 ## Remaining milestones
 
-The bounded content inspector, task grants,
+The task grants,
 controller, scripted/live agent adapters, 48-case evaluation, comparison report,
 and release recording remain unimplemented. The public `inspect`, `demo`, `eval`,
 and `report` commands will arrive with those milestones. No attack-success,

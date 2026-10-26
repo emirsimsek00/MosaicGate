@@ -10,10 +10,17 @@ import shutil
 import subprocess
 import sys
 from collections.abc import Sequence
+from pathlib import Path
 
-from mcp.types import ImageContent, TextContent
+from mcp.types import CallToolResult, ImageContent, TextContent
 
 from mosaicgate import __version__
+from mosaicgate.inspection import (
+    InspectionCaps,
+    InspectionContext,
+    decision_record,
+    inspect_tool_result,
+)
 from mosaicgate.smoke_fixtures import Modality
 from mosaicgate.transport import fixture_client
 
@@ -72,6 +79,35 @@ async def smoke(modality: Modality) -> dict[str, object]:
         }
 
 
+def inspect_file(path: Path, modality: Modality, scenario_id: str) -> dict[str, object]:
+    """Inspect one local file without printing its contents or forwarding it."""
+    caps = InspectionCaps()
+    limit = caps.text_bytes if modality == Modality.TEXT else caps.image_bytes
+    if path.stat().st_size > limit:
+        raise ValueError("Input exceeds the configured inspection size limit.")
+    if modality == Modality.TEXT:
+        result = CallToolResult(content=[TextContent(text=path.read_text(encoding="utf-8"))])
+    else:
+        result = CallToolResult(
+            content=[
+                ImageContent(
+                    data=base64.b64encode(path.read_bytes()).decode("ascii"),
+                    mime_type={
+                        ".png": "image/png",
+                        ".jpg": "image/jpeg",
+                        ".jpeg": "image/jpeg",
+                        ".webp": "image/webp",
+                    }.get(path.suffix.lower(), "application/octet-stream"),
+                )
+            ]
+        )
+    return decision_record(
+        inspect_tool_result(
+            result, InspectionContext(tool_name="read_report", scenario_id=scenario_id)
+        )
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=__version__)
@@ -79,8 +115,17 @@ def main(argv: Sequence[str] | None = None) -> int:
     commands.add_parser("doctor", help="Check the installed offline runtime without API calls")
     smoke_parser = commands.add_parser("smoke", help="Exercise a real local MCP read_report call")
     smoke_parser.add_argument("--modality", choices=list(Modality), default=Modality.TEXT)
+    inspect_parser = commands.add_parser("inspect", help="Inspect a local text or image fixture")
+    inspect_parser.add_argument("--input", type=Path, required=True)
+    inspect_parser.add_argument("--modality", choices=list(Modality), required=True)
+    inspect_parser.add_argument("--scenario", default="local-inspection")
     args = parser.parse_args(argv)
-    output = doctor() if args.command == "doctor" else asyncio.run(smoke(Modality(args.modality)))
+    if args.command == "doctor":
+        output = doctor()
+    elif args.command == "smoke":
+        output = asyncio.run(smoke(Modality(args.modality)))
+    else:
+        output = inspect_file(args.input, Modality(args.modality), args.scenario)
     print(json.dumps(output, indent=2, sort_keys=True))
     return 0
 
