@@ -15,12 +15,16 @@ from pathlib import Path
 from mcp.types import CallToolResult, ImageContent, TextContent
 
 from mosaicgate import __version__
+from mosaicgate.agents import ScriptedAgent
+from mosaicgate.controller import Controller, Scenario, append_run
+from mosaicgate.grants import Mode
 from mosaicgate.inspection import (
     InspectionCaps,
     InspectionContext,
     decision_record,
     inspect_tool_result,
 )
+from mosaicgate.live_settings import LivePrerequisiteError, require_live_settings
 from mosaicgate.smoke_fixtures import Modality
 from mosaicgate.transport import fixture_client
 
@@ -48,7 +52,7 @@ def doctor() -> dict[str, object]:
         },
         "ocr": ocr,
         "live_api_requests": 0,
-        "security_status": "foundation only; enforcement not yet implemented",
+        "security_status": "inspector and controller implemented; evaluation pending",
     }
 
 
@@ -108,6 +112,49 @@ def inspect_file(path: Path, modality: Modality, scenario_id: str) -> dict[str, 
     )
 
 
+def demo_scenario(scenario_id: str) -> Scenario:
+    root = Path.cwd()
+    if scenario_id == "benign-text":
+        return Scenario(scenario_id, Modality.TEXT)
+    if scenario_id == "benign-image":
+        return Scenario(scenario_id, Modality.IMAGE)
+    if scenario_id == "injection-text":
+        return Scenario(
+            scenario_id,
+            Modality.TEXT,
+            root / "fixtures" / "demo" / "attack.txt",
+            label="malicious",
+        )
+    raise ValueError(f"Unknown demo scenario: {scenario_id}")
+
+
+async def run_demo(
+    scenario_id: str, mode: Mode, agent_name: str, output: Path
+) -> dict[str, object]:
+    scenario = demo_scenario(scenario_id)
+    if agent_name == "scripted":
+        trace = await Controller().run(scenario, mode, ScriptedAgent())
+    else:
+        from mosaicgate.gemini_agent import GeminiAgent
+
+        settings = require_live_settings()
+        async with GeminiAgent(settings) as agent:
+            trace = await Controller().run(scenario, mode, agent)
+    append_run(output, trace)
+    return {
+        "run_id": trace.run_id,
+        "scenario_id": trace.scenario_id,
+        "mode": trace.mode,
+        "agent_id": trace.agent_id,
+        "termination": trace.termination,
+        "proposed_calls": len(trace.proposed_calls),
+        "executed_tool_events": len(trace.executed_tool_events),
+        "api_requests": trace.api_requests,
+        "simulation": True,
+        "trace_path": str(output),
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--version", action="version", version=__version__)
@@ -119,14 +166,26 @@ def main(argv: Sequence[str] | None = None) -> int:
     inspect_parser.add_argument("--input", type=Path, required=True)
     inspect_parser.add_argument("--modality", choices=list(Modality), required=True)
     inspect_parser.add_argument("--scenario", default="local-inspection")
+    demo_parser = commands.add_parser("demo", help="Run a synthetic agent task through MCP")
+    demo_parser.add_argument("--scenario", required=True)
+    demo_parser.add_argument("--mode", choices=("baseline", "inspect", "full"), required=True)
+    demo_parser.add_argument("--agent", choices=("scripted", "gemini"), default="scripted")
+    demo_parser.add_argument("--output", type=Path, default=Path("runs/demo.jsonl"))
     args = parser.parse_args(argv)
     if args.command == "doctor":
         output = doctor()
     elif args.command == "smoke":
         output = asyncio.run(smoke(Modality(args.modality)))
+    elif args.command == "demo":
+        try:
+            output = asyncio.run(run_demo(args.scenario, args.mode, args.agent, args.output))
+        except LivePrerequisiteError as error:
+            parser.error(str(error))
     else:
         output = inspect_file(args.input, Modality(args.modality), args.scenario)
     print(json.dumps(output, indent=2, sort_keys=True))
+    if args.command == "demo" and output["termination"] == "error":
+        return 1
     return 0
 
 

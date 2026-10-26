@@ -83,10 +83,11 @@ The current model is `gemini-3.6-flash`, with model-default sampling and low
 thinking. Preserve full returned model content and IDs; function responses use
 role `user` and native image bytes. Automatic tool execution stays disabled.
 
-Step 3 inspector is implemented and passed 64 tests, Ruff, formatting, and
-strict mypy; the commit/push checkpoint is recorded in the verification log.
-The local diagnostic command is `mosaicgate inspect --input PATH --modality
-text|image`. Step 4 is next: strict task grants and the single controller-owned
-dispatch path. Follow the sequential log checklist.
+Step 3 inspector is implemented and pushed (`19e63e6`), with 64 passing tests
+at its gate. Step 4 adds strict grants, one controller dispatch path, scripted
+and manual Gemini adapters, and three comparison modes. One live benign-image
+task completed using Gemini 3.6 Flash and local simulated email; see the log.
+The Step-4 gate, commit, and push are the next checkpoint. Step 5 follows only
+after they succeed. Continue the sequential checklist.
 GitHub SSH pushes work; GitHub CLI is unauthenticated, so release visibility
 management still needs authentication. See the verification log for evidence.

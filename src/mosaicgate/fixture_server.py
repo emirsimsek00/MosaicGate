@@ -5,6 +5,7 @@ import base64
 import json
 import re
 from collections.abc import Sequence
+from pathlib import Path
 from typing import TypedDict
 
 from mcp.server import MCPServer
@@ -20,10 +21,21 @@ class SimulatedEvent(TypedDict):
     simulation: bool
 
 
-def create_server(modality: Modality = Modality.TEXT) -> MCPServer[None]:
+def create_server(
+    modality: Modality = Modality.TEXT, payload_file: Path | None = None
+) -> MCPServer[None]:
     """A new server owns its own ledger; no process-global side-effect state."""
     server: MCPServer[None] = MCPServer("MosaicGate synthetic fixture", log_level="ERROR")
     ledger: list[SimulatedEvent] = []
+    if payload_file is None:
+        report_text = REPORT_TEXT
+        report_image = report_png()
+    elif modality == Modality.TEXT:
+        report_text = payload_file.read_text(encoding="utf-8")
+        report_image = b""
+    else:
+        report_text = ""
+        report_image = payload_file.read_bytes()
 
     def record(tool: str, arguments: dict[str, str]) -> SimulatedEvent:
         event: SimulatedEvent = {
@@ -47,11 +59,11 @@ def create_server(modality: Modality = Modality.TEXT) -> MCPServer[None]:
             return CallToolResult(
                 content=[
                     ImageContent(
-                        data=base64.b64encode(report_png()).decode("ascii"), mime_type="image/png"
+                        data=base64.b64encode(report_image).decode("ascii"), mime_type="image/png"
                     )
                 ]
             )
-        return CallToolResult(content=[TextContent(text=REPORT_TEXT)])
+        return CallToolResult(content=[TextContent(text=report_text)])
 
     @server.tool()
     def send_email(to: str, body: str) -> CallToolResult:
@@ -87,8 +99,9 @@ def create_server(modality: Modality = Modality.TEXT) -> MCPServer[None]:
 def main(argv: Sequence[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--modality", choices=list(Modality), default=Modality.TEXT)
+    parser.add_argument("--payload-file", type=Path)
     args = parser.parse_args(argv)
-    create_server(Modality(args.modality)).run(transport="stdio")
+    create_server(Modality(args.modality), args.payload_file).run(transport="stdio")
 
 
 if __name__ == "__main__":
