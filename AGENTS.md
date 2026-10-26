@@ -98,8 +98,11 @@ The Step-5 full gate passed (79 tests, Ruff, formatting, mypy). The free-tier
 Gemini held-out run stopped at HTTP 429: 8/72 completed sessions,
 25 attempted API requests, 64 missing, with three initial `ConnectError`
 attempts. Its partial report and trace are in `site/live/`. Never switch model,
-prompt, grant, tool schema, or billing mid-comparison. Commit and push Step 5
-before Step 6. GitHub SSH pushes work; GitHub CLI is
-unauthenticated, and the GitHub
+prompt, grant, tool schema, or billing mid-comparison. Step 5 was pushed as
+`f5560fb`. Step 6 has run the offline release demo, created a 60-second silent
+video from saved traces, and verified a clean source archive install without
+creating another checkout or copying `.env`. Its corrected full gate passed
+(79 tests, Ruff, formatting, mypy). Release commit, push, and publication
+remain. GitHub SSH pushes work; GitHub CLI is unauthenticated, and the GitHub
 app currently cannot read this private repository for visibility management.
 See the verification log for evidence.

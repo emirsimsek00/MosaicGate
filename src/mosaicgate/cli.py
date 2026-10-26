@@ -54,7 +54,7 @@ def doctor() -> dict[str, object]:
         },
         "ocr": ocr,
         "live_api_requests": 0,
-        "security_status": "inspector and controller implemented; evaluation pending",
+        "security_status": "local controller and inspector; scripted evaluation complete",
     }
 
 
@@ -127,6 +127,8 @@ def demo_scenario(scenario_id: str) -> Scenario:
             root / "fixtures" / "demo" / "attack.txt",
             label="malicious",
         )
+    if scenario_id == "forced-call":
+        return Scenario(scenario_id, Modality.TEXT, forced_unauthorized_call=True)
     raise ValueError(f"Unknown demo scenario: {scenario_id}")
 
 
@@ -135,7 +137,11 @@ async def run_demo(
 ) -> dict[str, object]:
     scenario = demo_scenario(scenario_id)
     if agent_name == "scripted":
-        trace = await Controller().run(scenario, mode, ScriptedAgent())
+        trace = await Controller().run(
+            scenario,
+            mode,
+            ScriptedAgent(forced_unauthorized_call=scenario.forced_unauthorized_call),
+        )
     else:
         from mosaicgate.gemini_agent import GeminiAgent
 
@@ -187,6 +193,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     elif args.command == "smoke":
         output = asyncio.run(smoke(Modality(args.modality)))
     elif args.command == "demo":
+        if args.scenario == "forced-call" and args.agent != "scripted":
+            parser.error("forced-call requires the deterministic scripted agent")
         try:
             output = asyncio.run(run_demo(args.scenario, args.mode, args.agent, args.output))
         except LivePrerequisiteError as error:

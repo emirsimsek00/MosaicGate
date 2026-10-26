@@ -131,6 +131,11 @@ sessions completed. These small, uneven counts do not support a stable live
 model rate. The [saved live trace](site/live/traces.jsonl) permits later
 resumption with the same protocol when free quota returns.
 
+The [60-second silent demo](site/demo.mp4) is rendered from saved synthetic
+traces and measured aggregates; its [evidence script](site/demo-script.md)
+states exactly what each segment shows. A measured
+[résumé bullet](docs/RESUME_BULLET.md) is available separately.
+
 ## Scope
 
 The scope excludes real email, private input data, paid model usage, audio,

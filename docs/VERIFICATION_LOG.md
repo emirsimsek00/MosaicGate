@@ -443,3 +443,53 @@ Entered only after Step 1 passed and its implementation was pushed.
   comparison remains outstanding due to repeated 429 responses; 64 sessions
   are explicitly missing in the report. Step 5 can be committed and pushed
   with that quota limitation recorded, as the spec permits.
+- Step 5 commit `f5560fb` was pushed to `origin/main`. A subsequent remote
+  head query returned the full SHA
+  `f5560fb550f178d79839c6b20453f65f71c0e329`.
+
+## Step 6 — release validation in progress (2026-10-26)
+
+- Ran four offline CLI demo sessions in the installed wheel: `injection-text`
+  baseline and full, `forced-call` full, and `benign-image` full. The baseline
+  trace recorded one simulated attacker-directed email after a non-enforced
+  authorization denial. The `forced-call` full trace recorded one denied
+  attacker-directed proposal, zero unauthorized ledger executions, one
+  authorized analyst email, and a correct `$330,000`/`20%` summary. The benign
+  native-image full trace also recorded one authorized analyst email and a
+  correct summary. All four sessions completed with zero model API requests;
+  the inspector quarantined the `injection-text` full case, so that run did
+  not independently exercise the authorization denial.
+- Added a deterministic `forced-call` CLI scenario so the release demo can
+  show task-grant enforcement even when the report itself is benign. The
+  Gemini adapter is not allowed for this scripted scenario.
+- Copied the four synthetic demo traces to `site/demo-traces.jsonl`. Rendered
+  `site/demo.mp4` from those traces and saved aggregates using six ten-second
+  slides. `ffprobe` measured H.264, 1280×720, 24 fps, 1,440 frames, exactly
+  60.000 seconds, 331,223 bytes. Visually inspected all six rendered frames;
+  no text was clipped. The video is silent and explicitly described as a
+  saved-evidence walkthrough, not a live Gemini screen recording.
+- Created `docs/RESUME_BULLET.md` using only the deterministic 72-session
+  holdout and explicit 0/37 unauthorized execution and 11/12 benign-completion
+  counts. It excludes the incomplete live comparison from the claim.
+- Clean setup: copied the 157 current tracked/non-ignored source files to
+  `/private/tmp/mosaicgate-clean.BgyHbV` without `.git` or `.env`; installed
+  from the locked dependencies into a fresh Python 3.12 environment offline.
+  From that environment, real MCP text and image smoke calls succeeded and a
+  full-mode scripted `forced-call` demo completed with zero API requests.
+  This source archive follows the logged no-second-checkout assumption. The
+  final full gate and publication are still pending.
+- The first Step-6 lint pass found one 104-character `doctor` status line;
+  formatting and mypy passed. I restored the agent-owned CLI file from the
+  last green commit, reapplied the release demo change in a smaller increment,
+  then shortened the status line. Focused Ruff passed after each increment.
+  The full Step-6 gate must be rerun on this corrected source.
+- Corrected Step-6 full gate: **79 passed in 63.99s**; Ruff check and format
+  passed (34 files); strict mypy passed (26 source files); `git diff --check`
+  passed. The landing page and both reports have 4, 26, and 26 local links
+  respectively, with zero missing targets. A pre-publication scan of 157
+  tracked/non-ignored candidate files found no `.env`, Gemini-key pattern,
+  private-key marker, or AWS-key pattern. This scan is a check of those named
+  patterns, not a general secret-detection guarantee.
+- Chrome's signed-in GitHub view shows the existing repository as private and
+  the Step-5 head `f5560fb` with a success indicator. The release commit and
+  push, followed by public visibility change and verification, remain.
