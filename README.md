@@ -148,5 +148,5 @@ steganography, general MCP proxying, and production authorization claims.
 - [Synthetic fixture convention](fixtures/README.md).
 - [Dependency and API references](docs/DEPENDENCY_NOTES.md).
 
-MIT licensed. Publication of the existing GitHub repository follows final
-validation.
+MIT licensed. The validated repository is public at
+[github.com/emirsimsek00/MosaicGate](https://github.com/emirsimsek00/MosaicGate).

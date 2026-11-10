@@ -44,7 +44,7 @@ kept separate from deterministic tests and offline scripted results.
   before tuning; offline regression; free-tier live comparison when possible;
   append-only/resumable evidence, aggregate JSON and static report; full checks;
   commit and push.
-- [ ] 6. Release: offline end-to-end and clean-install validation, 60-second
+- [x] 6. Release: offline end-to-end and clean-install validation, 60-second
   recording, measured resume bullet, honest implemented/measured/future docs;
   full checks; commit and push; publish validated repository.
 
@@ -564,3 +564,27 @@ Entered only after Step 1 passed and its implementation was pushed.
   matches in the updated saved live trace ended with reserved `.test` domains
   after removing sentence punctuation. These are scoped checks, not a general
   guarantee that every possible secret or sensitive datum has been found.
+
+## Publication — 2026-11-10
+
+- Committed the refreshed live evidence, self-contained report trace, video,
+  documentation, and regression assertion as `37394c4`. Pushed to
+  `origin/main`; a remote-head query returned the full SHA
+  `37394c4b6ff0e3f21094a6ebe2ca135a0c8e3f90`.
+- GitHub Actions offline run `42903095318` for that exact SHA completed
+  **successfully**. All eight earlier completed Actions runs were also
+  successful. Scanned the logs for all nine completed runs for named
+  high-confidence Google API key, GitHub token, private-key, and AWS key
+  patterns: zero matches. This is a scoped pattern check, not a complete
+  privacy audit of every possible log field.
+- Verified the account had admin permission on the existing private
+  `emirsimsek00/MosaicGate` repository, then changed its visibility to
+  **public**. `gh repo view` returned `PUBLIC`. An unauthenticated HTTP request
+  to the repository page returned 200; an unauthenticated request to the
+  committed live report returned 200; the public GitHub API returned the same
+  `37394c4b6ff0e3f21094a6ebe2ca135a0c8e3f90` `main` SHA.
+- This final status update is documentation-only. Its push and Actions result
+  are verified separately after committing; the GitHub Actions page remains
+  the source of truth for later commits. The publication-record local gate
+  passed: **79 tests in 61.31s**, Ruff check, Ruff format check (34 files),
+  strict mypy (26 source files), and `git diff --check`.

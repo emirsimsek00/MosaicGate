@@ -103,6 +103,8 @@ Step 6 has run the offline release demo, created a 60-second silent video from
 saved traces, and verified a clean source archive install without creating
 another checkout or copying `.env`. The release commit `e596320` is pushed.
 The local gate passed again on 2026-11-10 (79 tests, Ruff, formatting, mypy).
-GitHub Actions passed for release commit `e596320`; final changes and
-publication remain. GitHub SSH pushes work, and GitHub CLI is authenticated.
+GitHub Actions passed for release evidence commit `37394c4`. The existing
+repository is public; unauthenticated access to the repository and live report
+was verified. GitHub SSH pushes work, and GitHub CLI is authenticated. Check
+Actions for the CI result of any later commit.
 See the verification log for evidence.
