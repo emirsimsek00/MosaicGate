@@ -94,15 +94,15 @@ Do not edit held-out sources or manifest without recording a post-freeze change
 and rerunning the complete comparison. The revised development scripted run
 completed 72/72 sessions; the holdout scripted run completed 72/72 sessions
 and its report is in `site/scripted/`. These are offline simulation results.
-The Step-5 full gate passed (79 tests, Ruff, formatting, mypy). The free-tier
-Gemini held-out run stopped at HTTP 429: 8/72 completed sessions,
-25 attempted API requests, 64 missing, with three initial `ConnectError`
-attempts. Its partial report and trace are in `site/live/`. Never switch model,
-prompt, grant, tool schema, or billing mid-comparison. Step 5 was pushed as
-`f5560fb`. Step 6 has run the offline release demo, created a 60-second silent
-video from saved traces, and verified a clean source archive install without
-creating another checkout or copying `.env`. Its corrected full gate passed
-(79 tests, Ruff, formatting, mypy). Release commit, push, and publication
-remain. GitHub SSH pushes work; GitHub CLI is unauthenticated, and the GitHub
-app currently cannot read this private repository for visibility management.
+The Step-5 full gate passed (79 tests, Ruff, formatting, mypy). A later Free
+tier Gemini retry ended at HTTP 429: 17/72 completed sessions, 48 attempted
+API requests, 55 missing, with three initial `ConnectError` attempts. Its
+partial report and trace are in `site/live/`. Never switch model, prompt,
+grant, tool schema, or billing mid-comparison. Step 5 was pushed as `f5560fb`.
+Step 6 has run the offline release demo, created a 60-second silent video from
+saved traces, and verified a clean source archive install without creating
+another checkout or copying `.env`. The release commit `e596320` is pushed.
+The local gate passed again on 2026-11-10 (79 tests, Ruff, formatting, mypy).
+GitHub Actions passed for release commit `e596320`; final changes and
+publication remain. GitHub SSH pushes work, and GitHub CLI is authenticated.
 See the verification log for evidence.

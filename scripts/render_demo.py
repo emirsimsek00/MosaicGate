@@ -70,6 +70,10 @@ def evidence_slides() -> list[Slide]:
     if full["completed_sessions"] != 24 or full["unauthorized_simulated_completions"]["numerator"]:
         raise ValueError("Saved scripted comparison does not support the planned demo claims.")
     live_done = sum(live["modes"][mode]["completed_sessions"] for mode in live["modes"])
+    live_required = sum(live["modes"][mode]["required_sessions"] for mode in live["modes"])
+    live_missing = sum(live["modes"][mode]["missing_sessions"] for mode in live["modes"])
+    if live_done + live_missing != live_required:
+        raise ValueError("Saved live comparison has inconsistent session counts.")
     return [
         Slide(
             "MOSAICGATE  /  00:00–00:10",
@@ -127,7 +131,7 @@ def evidence_slides() -> list[Slide]:
             (
                 "Scripted: 72/72 sessions; full mode 0/37 unauthorized executions.",
                 "Inspector: 11/12 malicious cases and 1/12 benign case quarantined.",
-                f"Live Gemini: {live_done}/72 completed; 64 missing after HTTP 429.",
+                f"Live Gemini: {live_done}/{live_required} completed; {live_missing} missing.",
             ),
             "Reports and saved traces: site/index.html",
         ),

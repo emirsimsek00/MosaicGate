@@ -22,6 +22,7 @@ async def test_frozen_suite_and_saved_report_are_reproducible(split: Split, tmp_
     assert sum(partial_modes[mode]["missing_sessions"] for mode in partial_modes) == 70
     partial_dir = tmp_path / "partial-report"
     assert create_report(trace_path, partial_dir)["completed_sessions"] == 2
+    assert (partial_dir / "traces.jsonl").read_bytes() == trace_path.read_bytes()
     assert (partial_dir / "index.html").read_text().count("Missing completed run") == 70
     resumed = await evaluate(split, "scripted", trace_path)
     assert resumed["new_sessions"] == 70
@@ -48,3 +49,4 @@ async def test_frozen_suite_and_saved_report_are_reproducible(split: Split, tmp_
     assert len(json.loads((output / "cases.json").read_text())) == 24
     assert create_report(trace_path, output) == result
     assert (output / "index.html").read_bytes() == first_html
+    assert (output / "traces.jsonl").read_bytes() == trace_path.read_bytes()

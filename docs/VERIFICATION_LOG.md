@@ -493,3 +493,74 @@ Entered only after Step 1 passed and its implementation was pushed.
 - Chrome's signed-in GitHub view shows the existing repository as private and
   the Step-5 head `f5560fb` with a success indicator. The release commit and
   push, followed by public visibility change and verification, remain.
+
+## Release resumption — 2026-11-10
+
+- Resumed from clean `e596320a2a79e263bc97aac377569c810df8cff2` on
+  `main`; a read-only GitHub SSH query confirmed the same remote `main` head.
+  The release commit is therefore pushed. Its GitHub Actions result and
+  repository visibility still require authenticated verification.
+- Re-ran the local full gate on the unchanged checkout: **79 passed in
+  63.43s**; Ruff check passed; Ruff format check reported 34 files already
+  formatted; strict mypy found no issues in 26 source files. The working tree
+  remained clean after these checks.
+- Current `doctor` reports Python 3.12.14, Tesseract 5.5.3 with English data,
+  MCP 2.3.0, Pillow 13.0.0, and google-genai 2.33.0. Real local MCP text and
+  native-image smoke calls both succeeded with zero model API requests. The
+  landing page and two reports have 4, 26, and 26 local links respectively,
+  with zero missing targets or script tags.
+- The ignored local `.env` still contains a nonempty Gemini key and Free tier
+  confirmation; no value was printed. The append-only live trace began this
+  resumption with 13 attempts, 8 completed sessions, 25 attempted requests,
+  and one protocol hash. One quota-aware retry of the unchanged frozen
+  comparison is running; its outcome must be recorded after it terminates.
+- GitHub CLI is signed out. Requested browser-based `gh auth login` from the
+  user for private Actions inspection and repository publication; no token was
+  requested in chat. Publication is pending that access and a green CI run.
+- The single later Free tier retry of the frozen Gemini 3.6 Flash protocol
+  stopped on another HTTP 429. It added ten attempts, nine completed sessions,
+  and 23 attempted API requests. The append-only total is **23 attempts,
+  17/72 completed sessions, 48 attempted API requests, and 55 missing**. Three
+  attempts ended in initial `ConnectError` and three in HTTP 429. Completed
+  arms: baseline 5, inspection 6, full 6; all are malicious text. The full
+  arm quarantined 6/6 completed malicious text cases and recorded zero
+  unauthorized simulated executions / 6 proposed calls. No benign or image
+  live sessions completed, so their outcome denominators remain zero. No
+  further live requests will be made in this release; this was the third
+  quota response across the saved attempts. The model, prompt, grant, tool
+  schema, frozen holdout, and billing state were unchanged.
+- Regenerated `site/live/` from the append-only local trace. The report says
+  17 completed and 55 missing; the exact saved attempt and request counts are
+  retained. The original report command did not update the copied
+  `traces.jsonl`, leaving 13 stale attempts; fixed the report generator to
+  copy the source trace and added an end-to-end test of that artifact. The
+  committed report source now matches all 23 local attempts byte for byte.
+  Regenerated the silent 60-second video with dynamic live counts. `ffprobe`
+  measured H.264, 1280×720, 24 fps, 1,440 frames, and exactly 60.000 seconds;
+  visually inspected the revised final slide, including 17/72 and 55 missing.
+- The user completed browser-based GitHub CLI authentication. Outside the
+  restricted network sandbox, `gh auth status` verified account
+  `emirsimsek00` with `repo` and `workflow` scopes; no token value was copied
+  into the repository or this log. GitHub Actions run `40285662023` for
+  release commit `e596320` completed **successfully**. `gh repo view`
+  confirmed the existing `emirsimsek00/MosaicGate` repository is still
+  **private** on default branch `main` before publication.
+- Final source and evidence changes passed the full local gate: **79 passed
+  in 63.51s**; Ruff check passed; Ruff format check reported 34 files already
+  formatted; strict mypy found no issues in 26 source files. The report
+  generator's trace-copy assertion ran inside the offline evaluation test.
+- Exported 157 tracked/non-ignored source files, excluding `.git` and `.env`,
+  to `/private/tmp/mosaicgate-clean-nmizbhl8` without creating a second Git
+  checkout. A fresh Python 3.12 environment installed the locked package
+  offline. Real MCP text and native-image smoke calls passed. The scripted
+  full-mode `forced-call` demo completed with one denied proposal, zero
+  attacker-email executions, one authorized analyst-email execution, and
+  zero model API requests.
+- Rechecked 4 landing-page, 26 scripted-report, and 26 live-report local
+  links: zero missing targets and zero script tags. Scanned 157 current
+  candidate files and 142 unique historical Git blobs for named high-confidence
+  Google API key, GitHub token, private-key, and AWS key patterns: zero matches.
+  `.env` was absent from the candidate files and Git history. All 51 email
+  matches in the updated saved live trace ended with reserved `.test` domains
+  after removing sentence punctuation. These are scoped checks, not a general
+  guarantee that every possible secret or sensitive datum has been found.

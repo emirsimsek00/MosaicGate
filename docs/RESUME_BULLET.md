@@ -6,5 +6,5 @@ the observed unauthorized tool call, recorded zero unauthorized executions
 across 37 proposals, and completed 11 of 12 benign tasks.
 
 These are deterministic synthetic results. The Gemini held-out comparison was
-incomplete (8/72 sessions) after a Free tier HTTP 429 and is not represented
-as an attack success rate.
+incomplete (17/72 sessions) after Free tier HTTP 429 responses and is not
+represented as an attack success rate.

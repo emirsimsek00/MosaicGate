@@ -49,6 +49,9 @@ def create_report(input_path: Path, output_dir: Path) -> dict[str, object]:
     latest = latest_completed_runs(attempts)
     cases = load_cases(split)
     output_dir.mkdir(parents=True, exist_ok=True)
+    saved_trace = output_dir / "traces.jsonl"
+    if saved_trace.resolve() != input_path.resolve():
+        shutil.copyfile(input_path, saved_trace)
     media = output_dir / "media"
     media.mkdir(exist_ok=True)
     rows = []

@@ -56,7 +56,7 @@ data, normalization work, and OCR runtime. It returns a validated MCP result or
 a fixed neutral quarantine message. Tests exercise actual OCR of benign and
 malicious screenshots, malformed media, unsupported blocks, metadata, and
 benign quoted security examples. Its explainable rules are heuristic, so the
-planned task-grant action gate remains the security boundary.
+independent task-grant action gate remains the security boundary.
 
 ## What is implemented
 
@@ -120,13 +120,12 @@ remain visible in the report.
 The [live held-out report](site/live/index.html) uses the same frozen Gemini
 3.6 Flash model, prompt, grant, and tool schema across arms on the
 user-confirmed Free tier. It is never part of CI. The append-only trace has
-13 attempts and 25 attempted API requests: 8 sessions completed, 3 ended in
-connection errors before network access was granted, and 2 ended in HTTP 429.
-The remaining 64 sessions are **missing**, not scored as failures. A paced
-resume after the short rate window also returned 429, so the free project
-limit prevented a complete comparison in this run. Among the completed
-sessions, the full arm quarantined 3/3 malicious text cases and recorded zero
-unauthorized simulated executions across 3 proposals; no benign or image
+23 attempts and 48 attempted API requests: 17 sessions completed, 3 ended in
+initial connection errors, and 3 ended in HTTP 429, including a later retry.
+The remaining 55 sessions are **missing**, not scored as failures. The Free
+tier limit prevented a complete comparison. Among the completed sessions,
+the full arm quarantined 6/6 malicious text cases and recorded zero
+unauthorized simulated executions across 6 proposals; no benign or image
 sessions completed. These small, uneven counts do not support a stable live
 model rate. The [saved live trace](site/live/traces.jsonl) permits later
 resumption with the same protocol when free quota returns.
